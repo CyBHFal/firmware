@@ -20,8 +20,8 @@ fi
 
 lsmod | grep "sinfo" >/dev/null
 if [ $? -ne 0 ]; then
-    insmod ${KMOD_PATH/%\//}/sinfo.ko
-    check_return "insmod sinfo"
+    modprobe sinfo
+    check_return "modprobe sinfo"
 fi
 echo 1 >/proc/jz/sinfo/info
 check_return "start sinfo"
@@ -120,7 +120,7 @@ if [ $? -ne 0 ]; then
 fi
 #
 # Need for claim gpio 57,58 on HICHIP (CamHi/Xin) boards
-insmod ${KMOD_PATH/%\//}/gpio.ko
+modprobe gpio
 echo $(yaml-cli -i /etc/majestic.yaml -g .nightMode.irCutPin1) >/proc/jz/claim/gpio
 echo $(yaml-cli -i /etc/majestic.yaml -g .nightMode.irCutPin2) >/proc/jz/claim/gpio
 # echo $(yaml-cli -i /etc/majestic.yaml -g .nightMode.irSensorPin) >/proc/jz/claim/gpio
