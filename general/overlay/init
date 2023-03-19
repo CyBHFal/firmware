@@ -30,7 +30,25 @@ if ! grep -q 'root=.*nfs\|mmcblk\|ram' /proc/cmdline; then
       fi
     fi
   fi
+else
+  for overlay in $(cat /proc/cmdline); do
+    case $overlay in
+      overlay=*)
+        overlay="${overlay//overlay=}"
+        overlaydev=${overlay#*:}
+        if [ "$overlaydev" != "$overlay" ]; then
+          overlaytype=${overlay%:*}
+        fi
+        break
+        ;;
+    esac
+  done
+  if [ -n "${overlaydev}" ]; then
+    mount -t ${overlaytype:-f2fs} ${overlaydev} /overlay
+  fi
+fi
 
+if mountpoint -q /overlay; then
   if grep -q overlayfs /proc/filesystems; then
     mount -t overlayfs overlayfs -o lowerdir=/,upperdir=/overlay,ro /mnt || {
       umount /overlay
